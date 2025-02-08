@@ -66,7 +66,7 @@ async def root() -> dict:
 
 # Import and include routers
 from .routes import list_tables_tool
-app.include_router(list_tables_tool.router, prefix="/api", tags=["list_tables_tool"])
+app.include_router(list_tables_tool.router, tags=["list_tables_tool"])
 
 if __name__ == "__main__":
     import uvicorn
