@@ -24,8 +24,7 @@ dependencies = [
     "loguru>=0.7.2",
     "pytest>=8.0.0",
     "pytest-asyncio>=0.23.5",
-    "httpx>=0.26.0",
-    "psycopg2 (>=2.9.10,<3.0.0)"
+    "httpx>=0.26.0"
 ]
 
 
@@ -34,4 +33,7 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-package-mode = false
+package-mode = true
+packages = [
+    { include = "app" }
+]

@@ -4,14 +4,13 @@ services:
   fastapi_tool_server:
     container_name: fastapi_tool_server
     build:
-      context: /home/morossini/ai_tool_server
+      context: ../..
       dockerfile: app/docker/Dockerfile
     ports:
       - "8001:8000"
     environment:
       - DATABASE_URI=postgresql://ai_tool_user:ai_tool_password_123@fastapi_tool_db:5432/ai_tool_db
-      - FASTAPI_PORT=8000
-      - HOST=0.0.0.0
+      - FASTAPI_API_KEY=development_key
     networks:
       - fastapi_tool_network
     depends_on:
