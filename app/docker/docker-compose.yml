@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  fastapi_tool_server:
+    container_name: fastapi_tool_server
+    build:
+      context: /home/morossini/ai_tool_server
+      dockerfile: app/docker/Dockerfile
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URI=postgresql://ai_tool_user:ai_tool_password_123@fastapi_tool_db:5432/ai_tool_db
+      - FASTAPI_PORT=8000
+      - HOST=0.0.0.0
+    networks:
+      - fastapi_tool_network
+    depends_on:
+      fastapi_tool_db:
+        condition: service_healthy
+
+  fastapi_tool_db:
+    container_name: fastapi_tool_db
+    image: postgres:15-alpine
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=ai_tool_user
+      - POSTGRES_PASSWORD=ai_tool_password_123
+      - POSTGRES_DB=ai_tool_db
+    volumes:
+      - fastapi_tool_postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - fastapi_tool_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ai_tool_user -d ai_tool_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  fastapi_tool_network:
+    name: fastapi_tool_network
+    driver: bridge
+
+volumes:
+  fastapi_tool_postgres_data:
+    name: fastapi_tool_postgres_data 

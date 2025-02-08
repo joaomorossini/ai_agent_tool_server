@@ -42,3 +42,5 @@ test*
 venv/
 .pytest_cache/
 references/
+example_implementations/
+.cursor/
