@@ -82,7 +82,6 @@ Routes must be placed inside app/routes AND imported and included in the app, as
 ```python
 # File: app/main.py
 # Import and include routers
-from .routes import list_tables_tool
 app.include_router(list_tables_tool.router, tags=["list_tables_tool"])
 ```
 

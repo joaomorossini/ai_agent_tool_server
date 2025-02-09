@@ -82,11 +82,33 @@
    - Add request IDs for tracing
 
 3. **Graceful Error Handling**
+
    - Return user-friendly error messages
    - Log detailed error information for debugging
    - Use appropriate HTTP status codes
    - Handle both expected and unexpected errors
    - Distinguish between client errors (4xx) and server errors (5xx)
+
+4. **HTTP Status Codes**
+
+   - Use framework-provided status codes when possible (e.g., Pydantic's 422 for validation errors)
+   - 400 (Bad Request) for client errors that we explicitly handle
+   - 422 (Unprocessable Entity) for request validation failures
+   - 500 (Internal Server Error) for unexpected server-side errors
+   - Document expected status codes in tests and API documentation
+
+5. **Validation Strategy**
+
+   - Leverage framework validation (e.g., Pydantic) as the first line of defense
+   - Add custom validation only when framework validation is insufficient
+   - Keep validation logic close to the data models
+   - Document validation rules in both code and tests
+
+6. **Port Configuration**
+   - Keep port numbers consistent across all configurations
+   - Document port mappings in README and deployment files
+   - Use environment variables for flexible port configuration
+   - Test both local and deployed port configurations
 
 ## Testing Strategy
 
@@ -107,8 +129,35 @@
    - Test both success and error cases
 
 3. **Test Environment**
+
    - Keep test environment as close to production as possible
    - Use environment variables for configuration
    - Document test prerequisites
    - Provide setup and teardown instructions
    - Include example test data
+
+4. **Test Environment Setup**
+   - Ensure all required services (database, API server) are running before tests
+   - Use consistent port numbers across development and testing
+   - Document service dependencies and startup sequence
+   - Provide clear error messages when services are not available
+
+## Error Handling Improvements
+
+1. **Timeout Handling**
+
+   - Use HTTP 408 status code for timeout errors
+   - Consistent timeout handling across all routes
+   - Clear timeout error messages for clients
+
+2. **SQL Error Categories**
+
+   - Separate handling for syntax errors (ProgrammingError)
+   - Distinct handling for runtime errors (SQLAlchemyError)
+   - Appropriate status codes for different error types
+
+3. **Testing Improvements**
+   - Comprehensive error scenario coverage
+   - Consistent error response format
+   - Proper timeout testing
+   - Database fixture cleanup

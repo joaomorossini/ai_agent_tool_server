@@ -16,10 +16,23 @@ A FastAPI-based server that exposes OpenAPI compatible endpoints to be used as t
 1. Clone the repository
 2. Copy `.env.example` to `.env` and update the values
 3. Start the services:
+
    ```bash
+   # Start only the database
+   docker-compose -f app/docker/docker-compose.yml up -d fastapi_tool_db
+
+   # Or start all services including the API server
    docker-compose -f app/docker/docker-compose.yml up -d
    ```
-4. Visit http://localhost:8001/docs for interactive API documentation
+
+4. Visit http://localhost:8000/docs for interactive API documentation
+
+## Port Configuration
+
+| Service    | Host Port | Container Port | Environment Variable |
+| ---------- | --------- | -------------- | -------------------- |
+| FastAPI    | 8000      | 8000           | FASTAPI_PORT         |
+| PostgreSQL | 5434      | 5432           | DATABASE_PORT        |
 
 ## API Documentation
 
@@ -124,13 +137,30 @@ The API uses standard HTTP status codes to indicate the success or failure of re
 
 ### Running Tests
 
-```bash
-# Install test dependencies
-pip install pytest pytest-asyncio
+1. Ensure services are running:
 
-# Run tests
-pytest tests/test_routes.py -v
-```
+   ```bash
+   # Start PostgreSQL if not running
+   docker-compose -f app/docker/docker-compose.yml up -d fastapi_tool_db
+
+   # Start FastAPI server if not running
+   uvicorn app.main:app --reload --port 8000
+   ```
+
+2. Run tests:
+
+   ```bash
+   # Install test dependencies
+   pip install pytest pytest-asyncio
+
+   # Run tests with verbose output
+   pytest tests/test_routes.py -v
+   ```
+
+3. Common test issues:
+   - "Connection refused" - Check if FastAPI server is running on port 8000
+   - "Database connection failed" - Check if PostgreSQL is running on port 5434
+   - "Test database not found" - Ensure TEST_DB_URI environment variable is set correctly
 
 ### Local Development
 
@@ -152,11 +182,6 @@ pytest tests/test_routes.py -v
    ```bash
    ./scripts/deploy.sh
    ```
-
-### Port Mappings
-
-- FastAPI Server: 8001 (host) -> 8000 (container)
-- PostgreSQL: 5434 (host) -> 5432 (container)
 
 ## Troubleshooting
 

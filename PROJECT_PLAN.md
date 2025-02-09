@@ -8,8 +8,10 @@
    - [x] Run tests and identify issues
    - [x] Fix failing tests:
      - [x] Remove test_list_tables: Route was only for testing and is no longer needed
-     - [x] Fix test_sql_query_tool_error_handling: Simplified error handling
-   - [ ] Add test instructions to README
+     - [x] Fix test_sql_query_tool_error_handling: Updated to use correct HTTP status codes
+     - [x] Fix port configuration: Updated from 8001 to 8000 to match server setup
+   - [x] Add test instructions to README
+   - [x] Document test environment setup requirements
 
 2. API Documentation
 
@@ -17,6 +19,7 @@
    - [x] Add error scenarios and handling
    - [x] Include curl examples for testing
    - [x] Document timeout behavior
+   - [x] Document HTTP status codes and their meanings
 
 3. Deployment Documentation
    - [x] Update deployment instructions
@@ -39,6 +42,7 @@
 2. Error Handling
    - [x] Simplify error handling to focus on real use cases
    - [x] Remove unnecessary validation (rely on Pydantic)
+   - [x] Update status codes to match framework standards
    - Success Criteria:
      - [x] Correct HTTP status codes for all error cases
      - [x] Clear error messages
@@ -46,9 +50,10 @@
 
 ## Final Steps
 
-1. Run all tests again to verify fixes
-2. Add test instructions to README
-3. Document recent changes in PROJECT_LESSONS.md
+1. [x] Run all tests again to verify fixes
+2. [x] Add test instructions to README
+3. [x] Document recent changes in PROJECT_LESSONS.md
+4. [ ] Update Pydantic validators to V2 style
 
 ## Lessons Learned
 
@@ -57,6 +62,9 @@
 3. Remove unused code promptly
 4. Question if a test is still relevant before fixing it
 5. Take a step back when debugging to see the bigger picture
+6. Use framework-provided status codes when available
+7. Keep port configurations consistent and well-documented
+8. Ensure all services are running before running tests
 
 ---
 
