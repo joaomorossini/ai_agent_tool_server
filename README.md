@@ -1,95 +1,156 @@
 # AI Tool Server
 
-A FastAPI-based server for AI agent tools with OpenAPI 3.1.1 specification support.
+A FastAPI-based server that exposes OpenAPI compatible endpoints to be used as tools by autonomous AI agents.
 
 ## Features
 
-- OpenAPI 3.1.1 compatibility
-- API Key authentication
-- Async operations support
-- Extensive logging
-- Easy extensibility through FastAPI routers
+- OpenAPI 3.1.1 specification support
+- Automatic API documentation
+- Extensive logging and error handling
+- Request timeout management
+- PostgreSQL database integration
+- Docker deployment support
 
-## Architecture
+## Quick Start
 
-### Project Structure
+1. Clone the repository
+2. Copy `.env.example` to `.env` and update the values
+3. Start the services:
+   ```bash
+   docker-compose -f app/docker/docker-compose.yml up -d
+   ```
+4. Visit http://localhost:8001/docs for interactive API documentation
 
-```
-ai_tool_server/
-├── app/
-│   ├── docker/         # Docker configuration files
-│   ├── routes/         # API route handlers
-│   ├── models/         # Pydantic models and database schemas
-│   ├── core/           # Core functionality and configurations
-│   └── utils/          # Utility functions and helpers
-├── tests/              # Test suite
-└── example_implementations/ # Reference implementations
-```
+## API Documentation
 
-### Design Principles
+### Health Check
 
-1. **Modularity**: Each route is a separate module, making it easy to add or remove functionality
-2. **Dependency Injection**: FastAPI's dependency system is used for clean service integration
-3. **Type Safety**: Full type hinting throughout the codebase
-4. **Configuration Management**: Environment-based configuration using `.env` files
-5. **API Documentation**: Auto-generated OpenAPI documentation
+**Endpoint**: `GET /health`
 
-### Adding New Features
+Check the server's health status.
 
-1. Create a new route module in `app/routes/`
-2. Define your Pydantic models in `app/models/`
-3. Implement the route logic following existing patterns
-4. Register the route in `app/main.py`
-5. Add tests in `tests/`
-
-## Local Development
-
-```zsh
-python -m uvicorn app.main:app --reload
+```bash
+curl http://localhost:8001/health
 ```
 
-## Docker Deployment
+**Response**:
 
-### Prerequisites
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-02-09T17:15:42.569315",
+  "version": "1.0.0"
+}
+```
 
-- Docker and Docker Compose installed
-- PostgreSQL client (optional, for direct DB access)
-- Access to the deployment server
+### SQL Query Tool
 
-### Environment Setup
+**Endpoint**: `POST /sql_query_tool`
 
-1. Create a `.env` file in the project root with the following variables:
+Execute SQL queries on the database.
 
-   ```env
-   # Server Configuration
-   FASTAPI_API_KEY=your_api_key
-   HOST=0.0.0.0
-   FASTAPI_PORT=8000
-   FASTAPI_BASE_URL=your_server_url  # e.g., https://api.example.com
+#### SELECT Queries
 
-   # Database Configuration
-   DATABASE_URI=postgresql://ai_tool_user:ai_tool_password_123@fastapi_tool_db:5432/ai_tool_db
+```bash
+curl -X POST http://localhost:8001/sql_query_tool \
+  -H "Content-Type: application/json" \
+  -d '{"query": "SELECT * FROM table_name"}'
+```
+
+**Response**:
+
+```json
+{
+  "results": [
+    { "column1": "value1", "column2": "value2" },
+    { "column1": "value3", "column2": "value4" }
+  ]
+}
+```
+
+#### INSERT/UPDATE/DELETE Queries
+
+```bash
+curl -X POST http://localhost:8001/sql_query_tool \
+  -H "Content-Type: application/json" \
+  -d '{"query": "INSERT INTO table_name (column1) VALUES ('value')"}'
+```
+
+**Response**:
+
+```json
+{
+  "message": "Query executed successfully",
+  "rows_affected": 1
+}
+```
+
+## Error Handling
+
+The API uses standard HTTP status codes to indicate the success or failure of requests:
+
+1. **400 Bad Request**
+
+   - Invalid SQL syntax
+   - Other client-side errors
+
+2. **500 Internal Server Error**
+
+   - Database connection errors
+   - Query execution errors
+   - Other server-side issues
+
+3. **Timeouts**
+   For operations exceeding the timeout limit (default: 10 seconds):
+   ```json
+   {
+     "warning": "Operation timed out after 10 seconds",
+     "message": "The request was processed but took longer than expected. Please try again or contact support if this persists."
+   }
    ```
 
-### Deployment Steps
+## Environment Variables
 
-1. Build and start the services:
+| Variable        | Description                  | Default |
+| --------------- | ---------------------------- | ------- |
+| FASTAPI_API_KEY | API key for authentication   | -       |
+| DATABASE_URI    | PostgreSQL connection string | -       |
+| TIMEOUT         | Operation timeout in seconds | 10      |
+| LOG_LEVEL       | Logging level                | INFO    |
+| FASTAPI_PORT    | Server port                  | 8000    |
+| HOST            | Server host                  | 0.0.0.0 |
+
+## Development
+
+### Running Tests
+
+```bash
+# Install test dependencies
+pip install pytest pytest-asyncio
+
+# Run tests
+pytest tests/test_routes.py -v
+```
+
+### Local Development
+
+1. Start the database:
 
    ```bash
-   docker-compose -f app/docker/docker-compose.yml up -d --build
+   docker-compose -f app/docker/docker-compose.yml up -d fastapi_tool_db
    ```
 
-2. Verify deployment:
-
+2. Run the server in development mode:
    ```bash
-   # Check running containers
-   docker ps
+   uvicorn app.main:app --reload --port 8001
+   ```
 
-   # Verify API health (replace {SERVER_URL} with your deployment URL)
-   curl https://{SERVER_URL}/health
+## Deployment
 
-   # Test database connection
-   curl https://{SERVER_URL}/list_tables
+1. Update `.env` with production values
+2. Deploy using the provided script:
+   ```bash
+   ./scripts/deploy.sh
    ```
 
 ### Port Mappings
@@ -97,75 +158,23 @@ python -m uvicorn app.main:app --reload
 - FastAPI Server: 8001 (host) -> 8000 (container)
 - PostgreSQL: 5434 (host) -> 5432 (container)
 
-### API Documentation
+## Troubleshooting
 
-- Swagger UI: `https://{SERVER_URL}/docs`
-- ReDoc: `https://{SERVER_URL}/redoc`
-- OpenAPI JSON: `https://{SERVER_URL}/openapi.json`
+1. **Connection Issues**
 
-### Troubleshooting
+   - Check container logs: `docker logs fastapi_tool_server`
+   - Ensure database is healthy: `docker logs fastapi_tool_db`
 
-If services don't start properly:
+2. **Database Issues**
 
-1. Check logs:
+   - Verify DATABASE_URI is correct
+   - Check database logs
+   - Try connecting directly:
+     ```bash
+     psql postgresql://ai_tool_user:ai_tool_password_123@localhost:5434/ai_tool_db
+     ```
 
-   ```bash
-   docker-compose -f app/docker/docker-compose.yml logs
-   ```
-
-2. Clean up and restart:
-
-   ```bash
-   # Stop services and remove volumes
-   docker-compose -f app/docker/docker-compose.yml down -v
-
-   # Remove all containers (if needed)
-   docker rm -f $(docker ps -aq)
-
-   # Clean up volumes
-   docker volume prune -f
-
-   # Rebuild and start
-   docker-compose -f app/docker/docker-compose.yml up -d --build
-   ```
-
-## Lessons Learned
-
-1. **Docker Deployment**
-
-   - Use absolute paths in `docker-compose.yml` context for remote deployment
-   - Ensure unique container and network names to avoid conflicts
-   - Implement proper health checks for dependent services
-   - Use unique and consistent volume names
-
-2. **Configuration Management**
-
-   - Keep sensitive data in `.env` files
-   - Use different environment files for different deployment environments
-   - Validate environment variables at startup
-
-3. **Database Management**
-   - Use initialization scripts for database setup
-   - Implement proper migration strategies
-   - Regular backup procedures
-
-## Areas for Improvement
-
-### Implemented
-
-- [x] Proper environment variable validation
-- [x] Database health checks
-- [x] API documentation endpoints
-
-### TODO
-
-- [ ] Implement database migrations using Alembic
-- [ ] Add CI/CD pipeline configuration
-- [ ] Implement automated backup strategy for PostgreSQL
-- [ ] Add rate limiting for API endpoints
-- [ ] Implement proper logging rotation
-- [ ] Add monitoring and metrics collection
-- [ ] Implement caching layer
-- [ ] Add integration tests
-- [ ] Implement proper error handling middleware
-- [ ] Add request validation middleware
+3. **Timeout Issues**
+   - Adjust TIMEOUT environment variable
+   - Check slow queries
+   - Monitor database performance

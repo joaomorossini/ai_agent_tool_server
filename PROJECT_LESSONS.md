@@ -39,20 +39,29 @@
    - Check server logs immediately when requests fail
    - Use curl commands for initial API testing
    - Document all test cases and their expected outcomes
+   - Start with local tests before testing deployed endpoints
+   - Use parameterized tests to avoid code duplication
+   - Focus on testing real use cases, not theoretical edge cases
+   - Question if a test is still relevant before fixing it
 
-2. **Debugging Best Practices**
+2. **Avoiding Overcomplication**
+
+   - Always question if we're solving the right problem
+   - Consider the actual users (AI agents) and their behavior
+   - Let framework features (like Pydantic validation) do their job
+   - Remove unused code and features promptly
+   - Don't spend time optimizing code that isn't used
+   - Remember that simpler code is usually more robust
+   - Focus on the higher-level goals rather than individual errors
+
+3. **Debugging Best Practices**
 
    - Start with health check endpoints to verify basic connectivity
    - Check logs at multiple levels (application, docker, database)
    - Test network connectivity and configuration
    - Document all issues found and their resolution process
-
-3. **Docker-Specific Lessons**
-   - Always check container logs when services aren't responding
-   - Verify network configuration between containers
-   - Use health checks in docker-compose configurations
-   - Monitor container status and restart policies
-   - Pay attention to port mappings (host:container)
+   - Take a step back when debugging to see the bigger picture
+   - Question if the bug is a symptom of a larger design issue
 
 ## Error Handling and Reliability
 
@@ -62,6 +71,7 @@
    - Use environment variables for configurable timeout values
    - Return user-friendly messages on timeout
    - Log timeout occurrences for monitoring
+   - Handle both client and server-side timeouts
 
 2. **Logging Strategy**
 
@@ -69,9 +79,36 @@
    - Include relevant data in logs (counts, operation types)
    - Mask sensitive information (credentials, personal data)
    - Use appropriate log levels (INFO for operations, ERROR for issues)
+   - Add request IDs for tracing
 
 3. **Graceful Error Handling**
    - Return user-friendly error messages
    - Log detailed error information for debugging
    - Use appropriate HTTP status codes
    - Handle both expected and unexpected errors
+   - Distinguish between client errors (4xx) and server errors (5xx)
+
+## Testing Strategy
+
+1. **Test Data Management**
+
+   - Use fixtures for consistent test data setup
+   - Clean up test data after each test run
+   - Isolate test database from production
+   - Use transactions to roll back changes
+   - Verify data state before and after tests
+
+2. **Test Organization**
+
+   - Group related tests into classes
+   - Use descriptive test names
+   - Document test purpose and expectations
+   - Handle expected failures gracefully
+   - Test both success and error cases
+
+3. **Test Environment**
+   - Keep test environment as close to production as possible
+   - Use environment variables for configuration
+   - Document test prerequisites
+   - Provide setup and teardown instructions
+   - Include example test data
