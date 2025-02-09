@@ -44,3 +44,4 @@ venv/
 references/
 example_implementations/
 .cursor/
+scratchpad*.ipynb

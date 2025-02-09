@@ -1,3 +1,5 @@
+# TODO: Add to README file instructions on how to deploy the server with this script
+
 #!/bin/bash
 
 # Exit on error
@@ -7,13 +9,13 @@ set -e
 REMOTE_USER="morossini"
 REMOTE_HOST="20.80.96.49"
 REMOTE_DIR="/home/morossini/ai_agent_tool_server"
-DOCKER_COMPOSE_FILE="app/docker/docker-compose.prod.yml"
-ENV_FILE="app/docker/.env.prod"
+DOCKER_COMPOSE_FILE="app/docker/docker-compose.yml"
+ENV_FILE=".env"
 
-# Check if .env.prod exists
+# Check if .env exists
 if [ ! -f "$ENV_FILE" ]; then
     echo "Error: $ENV_FILE not found!"
-    echo "Please create it from the template at ${ENV_FILE}.template"
+    echo "Please create it from .env.example"
     exit 1
 fi
 
@@ -26,13 +28,9 @@ rsync -avz --exclude 'logs' \
           --exclude '.git' \
           --exclude '__pycache__' \
           --exclude '*.pyc' \
-          --exclude '.env' \
           --exclude 'venv' \
           --exclude '.pytest_cache' \
           ./ $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/
-
-# Copy production environment file
-scp $ENV_FILE $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/app/docker/.env
 
 # SSH into remote server and deploy
 echo "Deploying on remote server..."
