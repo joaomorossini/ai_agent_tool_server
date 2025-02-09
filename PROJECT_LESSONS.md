@@ -52,3 +52,26 @@
    - Verify network configuration between containers
    - Use health checks in docker-compose configurations
    - Monitor container status and restart policies
+   - Pay attention to port mappings (host:container)
+
+## Error Handling and Reliability
+
+1. **Timeout Management**
+
+   - Implement timeouts at the route level for better control
+   - Use environment variables for configurable timeout values
+   - Return user-friendly messages on timeout
+   - Log timeout occurrences for monitoring
+
+2. **Logging Strategy**
+
+   - Log the beginning and end of important operations
+   - Include relevant data in logs (counts, operation types)
+   - Mask sensitive information (credentials, personal data)
+   - Use appropriate log levels (INFO for operations, ERROR for issues)
+
+3. **Graceful Error Handling**
+   - Return user-friendly error messages
+   - Log detailed error information for debugging
+   - Use appropriate HTTP status codes
+   - Handle both expected and unexpected errors

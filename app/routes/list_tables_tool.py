@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 from langchain_community.utilities import SQLDatabase
 from langchain_community.tools.sql_database.tool import ListSQLDatabaseTool
 from fastapi import APIRouter, HTTPException, Response
@@ -6,7 +6,9 @@ import os
 from dotenv import load_dotenv
 from loguru import logger
 from functools import lru_cache
-from datetime import datetime, timedelta
+from datetime import datetime
+
+from ..utils.decorators import with_timeout
 
 router = APIRouter()
 
@@ -24,7 +26,10 @@ def get_database():
     """
     database_uri = os.getenv("DATABASE_URI")
     if not database_uri:
+        logger.error("DATABASE_URI environment variable not set")
         raise ValueError("DATABASE_URI environment variable not set")
+    
+    logger.info(f"Connecting to database: {database_uri.split('@')[-1]}")  # Log only the host part
     return SQLDatabase.from_uri(database_uri)
 
 # Cache the list of tables for 5 minutes
@@ -39,12 +44,16 @@ def get_cached_tables(timestamp: str) -> List[str]:
     Returns:
         List[str]: A list of table names
     """
+    logger.info(f"Fetching tables list (cache key: {timestamp})")
     db = get_database()
     tool = ListSQLDatabaseTool(db=db)
     tables_str = tool._run()
     if not tables_str:
+        logger.warning("No tables found in database")
         return []
-    return [table.strip() for table in tables_str.split(",")]
+    tables = [table.strip() for table in tables_str.split(",")]
+    logger.info(f"Found {len(tables)} tables")
+    return tables
 
 @router.get(
     "/list_tables",
@@ -68,6 +77,7 @@ def get_cached_tables(timestamp: str) -> List[str]:
         }
     }
 )
+@with_timeout
 async def list_tables(response: Response) -> List[str]:
     """
     List all tables in the configured database.
@@ -89,12 +99,15 @@ async def list_tables(response: Response) -> List[str]:
             microsecond=0
         ).isoformat()
         
+        logger.info("Attempting to list tables")
+        
         # Get tables from cache
         tables = get_cached_tables(cache_key)
         
         # Set cache control headers
         response.headers["Cache-Control"] = "public, max-age=300"
         
+        logger.info(f"Successfully retrieved {len(tables)} tables")
         return tables
         
     except ValueError as e:

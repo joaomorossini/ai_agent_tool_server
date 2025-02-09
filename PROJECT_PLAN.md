@@ -1,3 +1,46 @@
+# START NOW
+
+## Documentation Updates Needed
+
+1. Tests
+
+- [ ] Create a test file which tests all routes both locally and on the server
+
+2. API Documentation
+
+   - [ ] Document all endpoints with examples
+   - [ ] Add error scenarios and handling
+   - [ ] Include curl examples for testing
+   - [ ] Document timeout behavior
+
+3. Deployment Documentation
+   - [ ] Update deployment instructions
+   - [ ] Document environment setup
+   - [ ] Add troubleshooting guide
+   - [ ] Document port mappings and network configuration
+
+---
+
+# BACKLOG
+
+## New Features
+
+1. /scheduler
+   - [ ] Review reference flask and tool implementation at "/Users/morossini/Projects/ai_agent_tool_server/example_implementations/"
+   - [ ] Reuse Flask independent implementation
+   - [ ] Convert Flask implementation to FastAPI
+   - [ ] Add route to FastAPI server
+   - [ ] Test route locally
+   - [ ] Add route to FastAPI server
+   - [ ] Test route on server
+   - Success Criteria:
+     - Implements timeout handling
+     - Has comprehensive logging
+     - Handles errors gracefully
+     - Has clear documentation
+
+---
+
 # DONE
 
 ## Initial Setup
@@ -19,61 +62,16 @@
   - [x] Test route on server
 - /sql_query_tool
   - [x] Create route
+  - [x] Test route locally
+  - [x] Add route to FastAPI server
+  - [x] Test route on server
+  - [x] Add timeout handling
+  - [x] Improve error handling and logging
 
-# TO DO
+## Improvements
 
-## Critical Issues to Fix
-
-1. Server Connectivity Issues
-
-   - [ ] Fix server not responding to HTTP requests
-   - [ ] Investigate if this is related to:
-     - Network/port configuration
-     - Docker network setup
-     - FastAPI configuration
-   - [ ] Add proper error handling and logging
-   - Success Criteria:
-     - All endpoints respond to requests
-     - Proper error messages are returned
-     - Logs show detailed information about requests and responses
-
-2. Database Connection
-   - [ ] Verify database connection settings
-   - [ ] Test database connectivity
-   - [ ] Add database health check
-   - Success Criteria:
-     - Database connection is stable
-     - Queries execute successfully
-     - Connection errors are properly handled and logged
-
-## Route-Specific Tasks
-
-1. /sql_query_tool
-
-   - [ ] Test route locally
-   - [ ] Add route to FastAPI server
-   - [ ] Test route on server
-   - Success Criteria:
-     - Can execute SELECT queries
-     - Can execute INSERT/UPDATE/DELETE queries
-     - Proper error handling for invalid queries
-     - Results are properly formatted
-
-2. /scheduler
-   - [ ] Create route
-   - [ ] Test route locally
-   - [ ] Add route to FastAPI server
-   - [ ] Test route on server
-
-## Documentation Updates Needed
-
-1. API Documentation
-
-   - [ ] Document all endpoints with examples
-   - [ ] Add error scenarios and handling
-   - [ ] Include curl examples for testing
-
-2. Deployment Documentation
-   - [ ] Update deployment instructions
-   - [ ] Document environment setup
-   - [ ] Add troubleshooting guide
+- [x] Fix server connectivity issues
+- [x] Add timeout decorator for all routes
+- [x] Enhance logging across all routes
+- [x] Verify database connection
+- [x] Test all endpoints successfully
