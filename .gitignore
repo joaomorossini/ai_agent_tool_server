@@ -37,7 +37,7 @@ logs/
 .docker/ 
 
 # Other
-test*
+test*.ipynb
 .venv/
 venv/
 .pytest_cache/
