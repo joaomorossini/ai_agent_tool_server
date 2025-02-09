@@ -161,3 +161,31 @@
    - Consistent error response format
    - Proper timeout testing
    - Database fixture cleanup
+
+## FastAPI External URL Configuration
+
+When deploying FastAPI applications that need to be accessed externally:
+
+1. **Server URL Configuration**
+
+   - Use `servers=[{"url": SERVER_URL}]` in FastAPI initialization instead of `root_path`
+   - This ensures OpenAPI documentation uses the correct external URL
+   - Set `SERVER_URL` to the actual external IP/domain where the service will be accessed
+
+2. **CORS Considerations**
+
+   - Configure CORS middleware to allow access from the external URL
+   - For development, `allow_origins=["*"]` is acceptable
+   - For production, restrict to specific domains
+   - CORS is particularly important for Swagger UI/ReDoc to work correctly
+
+3. **Documentation URLs**
+
+   - Always use the external URL in API documentation links
+   - Ensure consistency between the server URL and documentation endpoints
+   - Test documentation access from both internal and external networks
+
+4. **Environment Variables**
+   - Use `FASTAPI_BASE_URL` for overriding the default server URL
+   - Keep port configuration consistent across all references
+   - Document all URL-related environment variables clearly

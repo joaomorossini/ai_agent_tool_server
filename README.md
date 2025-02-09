@@ -124,14 +124,15 @@ The API uses standard HTTP status codes to indicate the success or failure of re
 
 ## Environment Variables
 
-| Variable           | Description                  | Default |
-| ------------------ | ---------------------------- | ------- |
-| FASTAPI_API_KEY    | API key for authentication   | -       |
-| DATABASE_URI       | PostgreSQL connection string | -       |
-| TIMEOUT            | Operation timeout in seconds | 10      |
-| LOG_LEVEL          | Logging level                | INFO    |
-| FASTAPI_PORT_LOCAL | Server port                  | 8000    |
-| HOST               | Server host                  | 0.0.0.0 |
+| Variable           | Description                  | Default                 |
+| ------------------ | ---------------------------- | ----------------------- |
+| FASTAPI_API_KEY    | API key for authentication   | -                       |
+| DATABASE_URI       | PostgreSQL connection string | -                       |
+| TIMEOUT            | Operation timeout in seconds | 10                      |
+| LOG_LEVEL          | Logging level                | INFO                    |
+| FASTAPI_PORT_LOCAL | Server port                  | 8000                    |
+| HOST               | Server host                  | 0.0.0.0                 |
+| FASTAPI_BASE_URL   | External URL for API access  | http://20.80.96.49:8000 |
 
 ## Development
 
@@ -161,6 +162,7 @@ The API uses standard HTTP status codes to indicate the success or failure of re
    - "Connection refused" - Check if FastAPI server is running on port 8000
    - "Database connection failed" - Check if PostgreSQL is running on port 5434
    - "Test database not found" - Ensure TEST_DB_URI environment variable is set correctly
+   - "CORS error in Swagger UI" - Ensure FASTAPI_BASE_URL is set correctly
 
 ### Local Development
 
@@ -178,3 +180,15 @@ The API uses standard HTTP status codes to indicate the success or failure of re
 ## Deployment
 
 1. Update `.env`
+2. Execute the deployment script on local machine:
+
+   ```bash
+   ./scripts/deploy.sh
+   ```
+
+   If the script is not executable, make it executable first:
+
+   ```bash
+   chmod +x scripts/deploy.sh
+   ./scripts/deploy.sh
+   ```

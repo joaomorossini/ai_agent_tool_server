@@ -34,7 +34,7 @@ logger.add(
 # Get environment variables with defaults
 PORT = int(os.getenv("FASTAPI_PORT_LOCAL", os.getenv("PORT", "8000")))
 HOST = os.getenv("HOST", "0.0.0.0")
-SERVER_URL = os.getenv("FASTAPI_BASE_URL", os.getenv("SERVER_URL", f"http://{HOST}:{PORT}"))
+SERVER_URL = os.getenv("FASTAPI_BASE_URL", f"http://20.80.96.49:{PORT}")
 
 # Initialize FastAPI app with OpenAPI 3.1.1 compatibility
 app = FastAPI(
@@ -42,7 +42,7 @@ app = FastAPI(
     description="API server for AI agent tools",
     version="1.0.0",
     openapi_version="3.1.1",
-    root_path=SERVER_URL,
+    servers=[{"url": SERVER_URL}],  # This ensures OpenAPI docs use the correct server URL
     openapi_url="/openapi.json",
     docs_url="/docs",
     redoc_url="/redoc"
@@ -51,7 +51,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # In production, you might want to restrict this
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
