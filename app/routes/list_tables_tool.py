@@ -1,7 +1,7 @@
 from typing import List, Optional
 from langchain_community.utilities import SQLDatabase
 from langchain_community.tools.sql_database.tool import ListSQLDatabaseTool
-from fastapi import APIRouter, HTTPException, Depends, Response
+from fastapi import APIRouter, HTTPException, Response
 import os
 from dotenv import load_dotenv
 from loguru import logger
