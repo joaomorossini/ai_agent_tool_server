@@ -36,54 +36,42 @@ async def execute_sql_query(
     
     Args:
         query_data: A SQLQuery object containing the SQL query to execute.
-            Expected format: {"query": "SELECT * FROM table_name"}
         db: Database session dependency.
     
     Returns:
-        Dict[str, Any]: A dictionary containing the query results.
-            Format: {"results": [{"column": "value", ...}, ...]}
+        Dict[str, Any]: Query results or execution status.
     
     Raises:
-        HTTPException: If the query is invalid or fails to execute.
+        HTTPException: For invalid queries or execution errors.
     """
     try:
-        sql_query = query_data.query  # Already validated and stripped by Pydantic
+        sql_query = query_data.query  # Already validated by Pydantic
         logger.info(f"Executing SQL query: {sql_query}")
         
-        # Execute the query
-        try:
-            result = db.execute(text(sql_query))
+        result = db.execute(text(sql_query))
+        
+        if sql_query.upper().strip().startswith("SELECT"):
+            rows = result.fetchall()
+            results = [dict(row._mapping) for row in rows]
+            logger.info(f"Query returned {len(results)} rows")
+            return {"results": results}
+        
+        # For non-SELECT queries
+        db.commit()
+        logger.info(f"Query affected {result.rowcount} rows")
+        return {
+            "message": "Query executed successfully",
+            "rows_affected": result.rowcount
+        }
             
-            # If the query is a SELECT, fetch results
-            if sql_query.upper().startswith("SELECT"):
-                rows = result.fetchall()
-                # Convert rows to list of dicts
-                results = [dict(row._mapping) for row in rows]
-                logger.info(f"Query returned {len(results)} rows")
-                return {"results": results}
-            
-            # For non-SELECT queries, commit and return affected rows
-            db.commit()
-            logger.info(f"Query affected {result.rowcount} rows")
-            return {"message": "Query executed successfully", "rows_affected": result.rowcount}
-            
-        except SQLAlchemyError as e:
-            logger.error(f"Database error: {str(e)}")
-            raise HTTPException(
-                status_code=500,
-                detail=f"Database error: {str(e)}"
-            )
-            
-    except ValueError as e:
-        # Pydantic validation errors are 400s
-        logger.error(f"Validation error: {str(e)}")
+    except SQLAlchemyError as e:
+        logger.error(f"Database error: {str(e)}")
         raise HTTPException(
-            status_code=400,
-            detail=str(e)
+            status_code=500,
+            detail=f"Database error: {str(e)}"
         )
     except Exception as e:
-        # Unexpected errors are 500s
-        logger.error(f"Unexpected error in execute_sql_query: {str(e)}")
+        logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Unexpected error: {str(e)}"

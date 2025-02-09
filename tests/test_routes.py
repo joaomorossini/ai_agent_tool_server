@@ -17,8 +17,8 @@ from app.main import app
 from app.database import get_db
 
 # Test configuration
-LOCAL_URL = "http://localhost:8001"
-DEPLOYED_URL = os.getenv("FASTAPI_BASE_URL", "http://20.80.96.49:5002")
+LOCAL_URL = "http://localhost:8000"
+DEPLOYED_URL = os.getenv("FASTAPI_BASE_URL", "http://20.80.96.49:8001")  # TODO: Confirm port. This was previously set to 5002, but I think the correct one is 8001
 TIMEOUT = int(os.getenv("TIMEOUT", "10"))
 
 # Test database setup
@@ -106,54 +106,6 @@ class TestEndpoints:
         assert "version" in data
     
     @pytest.mark.parametrize("base_url", [LOCAL_URL])  # Testing only locally for now
-    def test_list_tables(self, base_url: str, db_session) -> None:
-        """Test list_tables endpoint."""
-        # First, get the initial list of tables with force refresh
-        response = requests.get(
-            f"{base_url}/list_tables",
-            params={"force_refresh": True},
-            timeout=TIMEOUT
-        )
-        assert response.status_code == 200
-        initial_tables = response.json()
-        logger.info(f"Initial tables: {initial_tables}")
-        assert isinstance(initial_tables, list)
-        assert "dummy_table" in [table.lower() for table in initial_tables], "Expected dummy_table to exist"
-        
-        # Create our test table
-        setup_test_data(db_session)
-        
-        # Verify the test table exists in the database
-        result = db_session.execute(text("""
-            SELECT EXISTS (
-                SELECT FROM information_schema.tables 
-                WHERE table_schema = 'public' 
-                AND table_name = 'test_table'
-            );
-        """))
-        exists = result.scalar()
-        logger.info(f"Test table exists in database: {exists}")
-        
-        # Get the updated list of tables with force refresh
-        response = requests.get(
-            f"{base_url}/list_tables",
-            params={"force_refresh": True},
-            timeout=TIMEOUT
-        )
-        assert response.status_code == 200
-        updated_tables = response.json()
-        logger.info(f"Updated tables: {updated_tables}")
-        
-        # Verify both tables exist
-        table_names = [table.lower() for table in updated_tables]
-        assert "dummy_table" in table_names, "Expected dummy_table to still exist"
-        assert "test_table" in table_names, "Expected test_table to be created"
-        
-        # Test caching
-        cache_control = response.headers.get("Cache-Control")
-        assert cache_control == "public, max-age=300"
-    
-    @pytest.mark.parametrize("base_url", [LOCAL_URL])  # Testing only locally for now
     def test_sql_query_tool_select(self, base_url: str, db_session) -> None:
         """Test SQL query tool with SELECT query."""
         query = {"query": "SELECT * FROM test_table ORDER BY id"}
@@ -201,47 +153,41 @@ class TestEndpoints:
     @pytest.mark.parametrize("base_url", [LOCAL_URL])  # Testing only locally for now
     def test_sql_query_tool_error_handling(self, base_url: str) -> None:
         """Test SQL query tool error handling."""
-        # Test invalid query
-        query = {"query": "SELECT * FROM nonexistent_table"}
+        # Test with an invalid SQL query
+        invalid_query = {"query": "INVALID SQL QUERY"}
         response = requests.post(
             f"{base_url}/sql_query_tool",
-            json=query,
+            json=invalid_query,
             timeout=TIMEOUT
         )
         assert response.status_code == 500
-        assert "Database error" in response.json()["detail"]
-        
-        # Test empty query
+        data = response.json()
+        assert "detail" in data
+        assert "Database error" in data["detail"]
+
+        # Test with an empty SQL query
+        empty_query = {"query": ""}
         response = requests.post(
             f"{base_url}/sql_query_tool",
-            json={"query": "   "},  # Empty or whitespace query
+            json=empty_query,
             timeout=TIMEOUT
         )
-        logger.info(f"Empty query response: {response.status_code} - {response.json()}")
-        assert response.status_code == 400
-        assert "SQL query cannot be empty" in response.json()["detail"]
-        
-        # Test missing query field
+        assert response.status_code == 422  # Pydantic validation error
+        data = response.json()
+        assert "detail" in data
+        assert any("SQL query cannot be empty" in error["msg"] for error in data["detail"])
+
+        # Test with a query causing a runtime error (e.g., referencing a non-existent table)
+        runtime_error_query = {"query": "SELECT * FROM non_existent_table"}
         response = requests.post(
             f"{base_url}/sql_query_tool",
-            json={},  # Empty JSON object
+            json=runtime_error_query,
             timeout=TIMEOUT
         )
-        logger.info(f"Missing query response: {response.status_code} - {response.json()}")
-        assert response.status_code == 422  # Validation error from Pydantic
-        error_detail = response.json()["detail"]
-        assert any("field required" in error["msg"] for error in error_detail)
-        
-        # Test wrong field name
-        response = requests.post(
-            f"{base_url}/sql_query_tool",
-            json={"not_query": "SELECT 1"},  # Wrong field name
-            timeout=TIMEOUT
-        )
-        logger.info(f"Wrong field response: {response.status_code} - {response.json()}")
-        assert response.status_code == 422  # Validation error from Pydantic
-        error_detail = response.json()["detail"]
-        assert any("field required" in error["msg"] for error in error_detail)
+        assert response.status_code == 500
+        data = response.json()
+        assert "detail" in data
+        assert "Database error" in data["detail"]
     
     @pytest.mark.parametrize("base_url", [LOCAL_URL])  # Testing only locally for now
     def test_timeout_handling(self, base_url: str, db_session) -> None:

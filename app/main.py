@@ -109,8 +109,7 @@ async def root() -> dict:
     }
 
 # Import and include routers
-from .routes import list_tables_router, sql_query_router
-app.include_router(list_tables_router, tags=["list_tables_tool"])
+from .routes import sql_query_router
 app.include_router(sql_query_router, tags=["sql_query_tool"])
 
 if __name__ == "__main__":
