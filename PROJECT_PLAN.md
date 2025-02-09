@@ -1,5 +1,79 @@
 # START NOW
 
+- [ ] Update PROJECT_LESSONS.md with lessons learned:
+  1. Focus on real use cases, not theoretical edge cases
+  2. Let framework features (like Pydantic validation) do their job
+  3. Remove unused code promptly
+  4. Question if a test is still relevant before fixing it
+  5. Take a step back when debugging to see the bigger picture
+  6. Use framework-provided status codes when available
+  7. Keep port configurations consistent and well-documented
+  8. Ensure all services are running before running tests
+  9. Use parameterized tests to avoid code duplication
+
+1. /scheduler
+
+   - [ ] Review reference flask and tool implementation at "/Users/morossini/Projects/ai_agent_tool_server/example_implementations/"
+   - [ ] Reuse Flask independent implementation
+   - [ ] Convert Flask implementation to FastAPI
+   - [ ] Add route to FastAPI server
+   - [ ] Test route locally
+   - [ ] Add route to FastAPI server
+   - [ ] Test route on server
+
+   Success Criteria:
+
+   - Functional
+     - Scheduled tasks are executed correctly at the specified time
+   - Robustness
+     - Implements timeout handling
+     - Has comprehensive logging
+     - Handles errors gracefully
+     - Has clear documentation
+
+---
+
+# BACKLOG
+
+## New Features
+
+---
+
+# DONE
+
+## Initial Setup
+
+- [x] Deploy VM on Azure
+- [x] Install Docker and Docker Compose on VM
+- [x] Deploy Dify on VM with Docker Compose
+- [x] Deploy Evolution API on a separate VM
+- [x] Build and test basic FastAPI server locally
+- [x] Deploy FastAPI server along with Postgres on VM using Docker Compose
+- [x] Simplify environment configuration by consolidating to a single .env file
+
+## Features and Routes
+
+- /list-tables
+  - [x] Create route
+  - [x] Test route locally
+  - [x] Add route to FastAPI server
+  - [x] Test route on server
+- /sql_query_tool
+  - [x] Create route
+  - [x] Test route locally
+  - [x] Add route to FastAPI server
+  - [x] Test route on server
+  - [x] Add timeout handling
+  - [x] Improve error handling and logging
+
+## Improvements
+
+- [x] Fix server connectivity issues
+- [x] Add timeout decorator for all routes
+- [x] Enhance logging across all routes
+- [x] Verify database connection
+- [x] Test all endpoints successfully
+
 ## Documentation Updates Needed
 
 1. Tests
@@ -54,71 +128,3 @@
 2. [x] Add test instructions to README
 3. [x] Document recent changes in PROJECT_LESSONS.md
 4. [ ] Update Pydantic validators to V2 style
-
-## Lessons Learned
-
-1. Focus on real use cases, not theoretical edge cases
-2. Let framework features (like Pydantic validation) do their job
-3. Remove unused code promptly
-4. Question if a test is still relevant before fixing it
-5. Take a step back when debugging to see the bigger picture
-6. Use framework-provided status codes when available
-7. Keep port configurations consistent and well-documented
-8. Ensure all services are running before running tests
-
----
-
-# BACKLOG
-
-## New Features
-
-1. /scheduler
-   - [ ] Review reference flask and tool implementation at "/Users/morossini/Projects/ai_agent_tool_server/example_implementations/"
-   - [ ] Reuse Flask independent implementation
-   - [ ] Convert Flask implementation to FastAPI
-   - [ ] Add route to FastAPI server
-   - [ ] Test route locally
-   - [ ] Add route to FastAPI server
-   - [ ] Test route on server
-   - Success Criteria:
-     - Implements timeout handling
-     - Has comprehensive logging
-     - Handles errors gracefully
-     - Has clear documentation
-
----
-
-# DONE
-
-## Initial Setup
-
-- [x] Deploy VM on Azure
-- [x] Install Docker and Docker Compose on VM
-- [x] Deploy Dify on VM with Docker Compose
-- [x] Deploy Evolution API on a separate VM
-- [x] Build and test basic FastAPI server locally
-- [x] Deploy FastAPI server along with Postgres on VM using Docker Compose
-- [x] Simplify environment configuration by consolidating to a single .env file
-
-## Features and Routes
-
-- /list-tables
-  - [x] Create route
-  - [x] Test route locally
-  - [x] Add route to FastAPI server
-  - [x] Test route on server
-- /sql_query_tool
-  - [x] Create route
-  - [x] Test route locally
-  - [x] Add route to FastAPI server
-  - [x] Test route on server
-  - [x] Add timeout handling
-  - [x] Improve error handling and logging
-
-## Improvements
-
-- [x] Fix server connectivity issues
-- [x] Add timeout decorator for all routes
-- [x] Enhance logging across all routes
-- [x] Verify database connection
-- [x] Test all endpoints successfully

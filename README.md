@@ -180,7 +180,22 @@ The API uses standard HTTP status codes to indicate the success or failure of re
 ## Deployment
 
 1. Update `.env`
-2. Execute the deployment script on local machine:
+
+2. Configure Azure NSG Rules:
+
+   - Open Azure Portal
+   - Navigate to your VM's Network Security Group
+   - Add inbound security rules:
+     ```
+     Name: Allow-FastAPI
+     Priority: 1010
+     Port: 8000
+     Protocol: TCP
+     Source: Any (or restrict to specific IPs)
+     Action: Allow
+     ```
+
+3. Execute the deployment script on local machine:
 
    ```bash
    ./scripts/deploy.sh
@@ -192,3 +207,9 @@ The API uses standard HTTP status codes to indicate the success or failure of re
    chmod +x scripts/deploy.sh
    ./scripts/deploy.sh
    ```
+
+4. Verify Deployment:
+   - Check health endpoint: `curl http://<vm-ip>:8000/health`
+   - Verify Swagger UI: `http://<vm-ip>:8000/docs`
+   - Test a sample API request
+   - Monitor logs for any issues

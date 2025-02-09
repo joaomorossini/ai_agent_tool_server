@@ -189,3 +189,39 @@ When deploying FastAPI applications that need to be accessed externally:
    - Use `FASTAPI_BASE_URL` for overriding the default server URL
    - Keep port configuration consistent across all references
    - Document all URL-related environment variables clearly
+
+## Azure Deployment and Networking
+
+1. **Network Security Groups (NSG)**
+
+   - Always verify NSG inbound rules when deploying services
+   - Common required ports:
+     - 22 (SSH)
+     - 80/443 (HTTP/HTTPS)
+     - Application-specific ports (e.g., 8000 for FastAPI)
+   - Document all opened ports and their purposes
+   - Use meaningful names for rules (e.g., "Allow-FastAPI")
+   - Consider security implications of opening ports
+
+2. **Port Management**
+
+   - Avoid unnecessary port mapping in Docker Compose
+   - Use consistent port numbers across all environments
+   - Document port usage in both README and deployment guides
+   - Test connectivity after any port configuration changes
+   - Consider using environment variables for port configuration
+
+3. **External Access Configuration**
+
+   - Configure FastAPI to use correct external URLs
+   - Set proper CORS headers for external access
+   - Test documentation endpoints from external networks
+   - Use environment variables for base URLs
+   - Document all required network configurations
+
+4. **Deployment Checklist**
+   - Verify environment variables are set correctly
+   - Check NSG rules are configured properly
+   - Test all endpoints after deployment
+   - Verify documentation endpoints are accessible
+   - Monitor logs for any connection issues
