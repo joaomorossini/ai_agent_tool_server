@@ -40,5 +40,6 @@ ssh $REMOTE_USER@$REMOTE_HOST "cd $REMOTE_DIR && \
     docker-compose -f $DOCKER_COMPOSE_FILE up -d"
 
 echo "Deployment completed successfully!"
+echo "The server is now running at http://$REMOTE_HOST:8000"
 echo "You can check the logs with:"
 echo "ssh $REMOTE_USER@$REMOTE_HOST 'docker logs -f fastapi_tool_server'" 

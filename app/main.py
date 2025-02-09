@@ -32,7 +32,7 @@ logger.add(
 )
 
 # Get environment variables with defaults
-PORT = int(os.getenv("FASTAPI_PORT", os.getenv("PORT", "8000")))
+PORT = int(os.getenv("FASTAPI_PORT_LOCAL", os.getenv("PORT", "8000")))
 HOST = os.getenv("HOST", "0.0.0.0")
 SERVER_URL = os.getenv("FASTAPI_BASE_URL", os.getenv("SERVER_URL", f"http://{HOST}:{PORT}"))
 

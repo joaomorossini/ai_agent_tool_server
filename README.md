@@ -31,7 +31,7 @@ A FastAPI-based server that exposes OpenAPI compatible endpoints to be used as t
 
 | Service    | Host Port | Container Port | Environment Variable |
 | ---------- | --------- | -------------- | -------------------- |
-| FastAPI    | 8000      | 8000           | FASTAPI_PORT         |
+| FastAPI    | 8000      | 8000           | FASTAPI_PORT_LOCAL   |
 | PostgreSQL | 5434      | 5432           | DATABASE_PORT        |
 
 ## API Documentation
@@ -43,7 +43,7 @@ A FastAPI-based server that exposes OpenAPI compatible endpoints to be used as t
 Check the server's health status.
 
 ```bash
-curl http://localhost:8001/health
+curl http://localhost:8000/health
 ```
 
 **Response**:
@@ -65,7 +65,7 @@ Execute SQL queries on the database.
 #### SELECT Queries
 
 ```bash
-curl -X POST http://localhost:8001/sql_query_tool \
+curl -X POST http://localhost:8000/sql_query_tool \
   -H "Content-Type: application/json" \
   -d '{"query": "SELECT * FROM table_name"}'
 ```
@@ -84,7 +84,7 @@ curl -X POST http://localhost:8001/sql_query_tool \
 #### INSERT/UPDATE/DELETE Queries
 
 ```bash
-curl -X POST http://localhost:8001/sql_query_tool \
+curl -X POST http://localhost:8000/sql_query_tool \
   -H "Content-Type: application/json" \
   -d '{"query": "INSERT INTO table_name (column1) VALUES ('value')"}'
 ```
@@ -124,14 +124,14 @@ The API uses standard HTTP status codes to indicate the success or failure of re
 
 ## Environment Variables
 
-| Variable        | Description                  | Default |
-| --------------- | ---------------------------- | ------- |
-| FASTAPI_API_KEY | API key for authentication   | -       |
-| DATABASE_URI    | PostgreSQL connection string | -       |
-| TIMEOUT         | Operation timeout in seconds | 10      |
-| LOG_LEVEL       | Logging level                | INFO    |
-| FASTAPI_PORT    | Server port                  | 8000    |
-| HOST            | Server host                  | 0.0.0.0 |
+| Variable           | Description                  | Default |
+| ------------------ | ---------------------------- | ------- |
+| FASTAPI_API_KEY    | API key for authentication   | -       |
+| DATABASE_URI       | PostgreSQL connection string | -       |
+| TIMEOUT            | Operation timeout in seconds | 10      |
+| LOG_LEVEL          | Logging level                | INFO    |
+| FASTAPI_PORT_LOCAL | Server port                  | 8000    |
+| HOST               | Server host                  | 0.0.0.0 |
 
 ## Development
 
@@ -172,34 +172,9 @@ The API uses standard HTTP status codes to indicate the success or failure of re
 
 2. Run the server in development mode:
    ```bash
-   uvicorn app.main:app --reload --port 8001
+   uvicorn app.main:app --reload --port 8000
    ```
 
 ## Deployment
 
-1. Update `.env` with production values
-2. Deploy using the provided script:
-   ```bash
-   ./scripts/deploy.sh
-   ```
-
-## Troubleshooting
-
-1. **Connection Issues**
-
-   - Check container logs: `docker logs fastapi_tool_server`
-   - Ensure database is healthy: `docker logs fastapi_tool_db`
-
-2. **Database Issues**
-
-   - Verify DATABASE_URI is correct
-   - Check database logs
-   - Try connecting directly:
-     ```bash
-     psql postgresql://ai_tool_user:ai_tool_password_123@localhost:5434/ai_tool_db
-     ```
-
-3. **Timeout Issues**
-   - Adjust TIMEOUT environment variable
-   - Check slow queries
-   - Monitor database performance
+1. Update `.env`
