@@ -1,32 +1,60 @@
 """
 Database module for the AI Tool Server.
+Provides async database connection handling using asyncpg.
 """
 import os
-from typing import Generator
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from typing import AsyncGenerator
+from contextlib import asynccontextmanager
+import asyncpg
+from asyncpg.pool import Pool
 
 # Get database URI from environment variable
 DATABASE_URI = os.getenv("DATABASE_URI")
 if not DATABASE_URI:
     raise ValueError("DATABASE_URI environment variable is not set")
 
-# Create SQLAlchemy engine
-engine = create_engine(DATABASE_URI)
+# Global connection pool
+_pool: Pool = None
 
-# Create session factory
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-def get_db() -> Generator[Session, None, None]:
+async def get_pool() -> Pool:
     """
-    Get a database session.
+    Get or create the database connection pool.
+    
+    Returns:
+        Pool: The asyncpg connection pool
+    """
+    global _pool
+    if _pool is None:
+        _pool = await asyncpg.create_pool(
+            DATABASE_URI,
+            min_size=5,
+            max_size=20,
+            command_timeout=60
+        )
+    return _pool
+
+@asynccontextmanager
+async def get_db_connection() -> AsyncGenerator[asyncpg.Connection, None]:
+    """
+    Get a database connection from the pool.
     
     Yields:
-        Session: A SQLAlchemy session object.
+        Connection: An asyncpg connection object.
+        
+    Example:
+        async with get_db_connection() as conn:
+            result = await conn.fetch("SELECT * FROM my_table")
     """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close() 
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        yield conn
+
+async def close_pool() -> None:
+    """
+    Close the database connection pool.
+    Should be called when shutting down the application.
+    """
+    global _pool
+    if _pool:
+        await _pool.close()
+        _pool = None 

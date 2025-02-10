@@ -136,6 +136,90 @@ The API uses standard HTTP status codes to indicate the success or failure of re
 
 ## Development
 
+### Database Access
+
+The server uses asyncpg for asynchronous database operations. Connection pooling is configured with sensible defaults:
+
+```python
+# Production pool
+min_size=5
+max_size=20
+command_timeout=60
+
+# Test pool
+min_size=2
+max_size=10
+command_timeout=30
+```
+
+To use a database connection:
+
+```python
+async with get_db_connection() as conn:
+    # For queries returning results
+    rows = await conn.fetch("SELECT * FROM my_table")
+
+    # For queries affecting rows
+    result = await conn.execute("UPDATE my_table SET status = $1", "active")
+```
+
+### Testing
+
+Tests use transaction-based isolation to ensure clean state between test runs:
+
+```python
+@pytest_asyncio.fixture
+async def db_conn(db_pool: Pool) -> AsyncGenerator[asyncpg.Connection, None]:
+    async with db_pool.acquire() as conn:
+        await conn.execute("BEGIN")
+        try:
+            yield conn
+        finally:
+            await conn.execute("ROLLBACK")
+```
+
+### Scheduler Models
+
+The scheduler supports three types of jobs:
+
+1. One-time jobs:
+
+```json
+{
+  "type": "one-time",
+  "schedule": {
+    "run_at": "2024-02-10T15:00:00Z",
+    "timezone": "UTC"
+  }
+}
+```
+
+2. Interval jobs:
+
+```json
+{
+  "type": "interval",
+  "schedule": {
+    "interval_seconds": 3600,
+    "start_at": "2024-02-09T08:00:00Z",
+    "end_at": "2024-12-31T00:00:00Z",
+    "timezone": "UTC"
+  }
+}
+```
+
+3. Cron jobs:
+
+```json
+{
+  "type": "cron",
+  "schedule": {
+    "expression": "0 * * * *",
+    "timezone": "UTC"
+  }
+}
+```
+
 ### Running Tests
 
 1. Ensure services are running:

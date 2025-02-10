@@ -112,6 +112,9 @@ async def root() -> dict:
 from .routes import sql_query_router
 app.include_router(sql_query_router, tags=["sql_query_tool"])
 
+from app.routes import scheduler
+app.include_router(scheduler.router)
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
