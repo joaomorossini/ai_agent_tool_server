@@ -6,8 +6,8 @@ from fastapi import APIRouter, HTTPException
 from loguru import logger
 from pydantic import BaseModel, field_validator
 
-from ..database import get_db_connection
-from ..utils.decorators import with_timeout
+from ...database import get_db_connection
+from ...utils.decorators import with_timeout
 
 router = APIRouter()
 
@@ -23,7 +23,7 @@ class SQLQuery(BaseModel):
             raise HTTPException(status_code=400, detail="Query cannot be empty")
         return v
 
-@router.post("/sql_query_tool")
+@router.post("/tools/sql_query_tool")
 @with_timeout
 async def execute_sql_query(query_data: SQLQuery) -> Dict[str, Any]:
     """
