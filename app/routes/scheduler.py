@@ -3,6 +3,7 @@ FastAPI router for scheduler endpoints.
 """
 from typing import List, Optional
 from uuid import UUID
+from contextlib import asynccontextmanager
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
@@ -43,14 +44,11 @@ async def test_handler(message: str = "Hello, World!") -> dict:
 
 scheduler_service.register_handler("test", test_handler)
 
-@router.on_event("startup")
-async def startup_event():
-    """Start the scheduler service when the application starts."""
+@asynccontextmanager
+async def lifespan(app):
+    """Lifespan context manager for scheduler service."""
     await scheduler_service.start()
-
-@router.on_event("shutdown")
-async def shutdown_event():
-    """Stop the scheduler service when the application shuts down."""
+    yield
     await scheduler_service.stop()
 
 @router.post("/jobs", response_model=JobResponse)

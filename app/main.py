@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from typing import Optional
 import uuid
+from app.routes.scheduler import lifespan
 
 # Load environment variables
 load_dotenv()
@@ -45,7 +46,8 @@ app = FastAPI(
     servers=[{"url": SERVER_URL}],  # This ensures OpenAPI docs use the correct server URL
     openapi_url="/openapi.json",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # Configure CORS
@@ -114,6 +116,9 @@ app.include_router(sql_query_router, tags=["sql_query_tool"])
 
 from app.routes import scheduler
 app.include_router(scheduler.router)
+
+from app.routes.tools import zep_routes
+app.include_router(zep_routes.router)
 
 if __name__ == "__main__":
     import uvicorn

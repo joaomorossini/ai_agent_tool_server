@@ -4,12 +4,21 @@ CREATE TABLE IF NOT EXISTS dummy_table (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); 
 
+-- Create enum types
+DO $$ BEGIN
+    CREATE TYPE job_type AS ENUM ('one-time', 'interval', 'cron');
+    CREATE TYPE job_status AS ENUM ('pending', 'active', 'completed', 'failed', 'cancelled');
+    CREATE TYPE execution_status AS ENUM ('running', 'completed', 'failed');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
 -- Create jobs table
 CREATE TABLE IF NOT EXISTS jobs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
-    type VARCHAR(50) NOT NULL,
-    status VARCHAR(50) NOT NULL,
+    type job_type NOT NULL,
+    status job_status NOT NULL DEFAULT 'pending',
     schedule JSONB NOT NULL,
     parameters JSONB NOT NULL,
     next_run_time TIMESTAMP WITH TIME ZONE,
@@ -21,8 +30,8 @@ CREATE TABLE IF NOT EXISTS jobs (
 -- Create job executions table
 CREATE TABLE IF NOT EXISTS job_executions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    job_id UUID NOT NULL REFERENCES jobs(id),
-    status VARCHAR(50) NOT NULL,
+    job_id UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
+    status execution_status NOT NULL DEFAULT 'running',
     started_at TIMESTAMP WITH TIME ZONE NOT NULL,
     completed_at TIMESTAMP WITH TIME ZONE,
     error TEXT,

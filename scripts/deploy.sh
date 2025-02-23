@@ -11,6 +11,8 @@ REMOTE_HOST="20.80.96.49"
 REMOTE_DIR="/home/morossini/ai_agent_tool_server"
 DOCKER_COMPOSE_FILE="app/docker/docker-compose.yml"
 ENV_FILE=".env"
+SSH_KEY_PATH="/Users/morossini/Projects/azure_vm/azure_vm_1_ssh_key.pem"
+SSH_OPTIONS="-i $SSH_KEY_PATH"
 
 # Check if .env exists
 if [ ! -f "$ENV_FILE" ]; then
@@ -20,11 +22,12 @@ if [ ! -f "$ENV_FILE" ]; then
 fi
 
 # Create remote directory if it doesn't exist
-ssh $REMOTE_USER@$REMOTE_HOST "mkdir -p $REMOTE_DIR"
+ssh $SSH_OPTIONS $REMOTE_USER@$REMOTE_HOST "mkdir -p $REMOTE_DIR"
 
 # Copy necessary files to remote server
 echo "Copying files to remote server..."
-rsync -avz --exclude 'logs' \
+rsync -avz -e "ssh $SSH_OPTIONS" \
+          --exclude 'logs' \
           --exclude '.git' \
           --exclude '__pycache__' \
           --exclude '*.pyc' \
@@ -34,7 +37,7 @@ rsync -avz --exclude 'logs' \
 
 # SSH into remote server and deploy
 echo "Deploying on remote server..."
-ssh $REMOTE_USER@$REMOTE_HOST "cd $REMOTE_DIR && \
+ssh $SSH_OPTIONS $REMOTE_USER@$REMOTE_HOST "cd $REMOTE_DIR && \
     docker-compose -f $DOCKER_COMPOSE_FILE down && \
     docker-compose -f $DOCKER_COMPOSE_FILE build --no-cache && \
     docker-compose -f $DOCKER_COMPOSE_FILE up -d"
@@ -42,4 +45,4 @@ ssh $REMOTE_USER@$REMOTE_HOST "cd $REMOTE_DIR && \
 echo "Deployment completed successfully!"
 echo "The server is now running at http://$REMOTE_HOST:8000"
 echo "You can check the logs with:"
-echo "ssh $REMOTE_USER@$REMOTE_HOST 'docker logs -f fastapi_tool_server'" 
+echo "ssh $SSH_OPTIONS $REMOTE_USER@$REMOTE_HOST 'docker logs -f fastapi_tool_server'" 

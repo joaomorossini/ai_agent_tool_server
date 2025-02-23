@@ -26,7 +26,8 @@ dependencies = [
     "pytest-asyncio>=0.23.5",
     "httpx>=0.26.0",
     "asyncpg (>=0.30.0,<0.31.0)",
-    "croniter (>=6.0.0,<7.0.0)"
+    "croniter (>=6.0.0,<7.0.0)",
+    "zep-cloud (>=2.4.0,<3.0.0)"
 ]
 
 

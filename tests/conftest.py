@@ -20,12 +20,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 # Test database configuration
 TEST_DATABASE_URI = os.getenv("TEST_DATABASE_URI", DATABASE_URI)
 
-@pytest.fixture(scope="session")
-def event_loop():
-    """Create an instance of the default event loop for each test case."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
+# Configure pytest-asyncio to use session scope for event loop
+pytest_asyncio_scope = "session"
 
 @pytest_asyncio.fixture(scope="session")
 async def db_pool() -> AsyncGenerator[Pool, None]:
