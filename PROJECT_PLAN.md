@@ -2,6 +2,46 @@
 
 ## Scheduler Implementation
 
+### Overview
+
+The scheduler is a FastAPI-based service that handles job scheduling with three types of jobs:
+
+- One-time jobs
+- Interval-based jobs
+- Cron jobs
+
+### Important Files
+
+1. `app/models/scheduler_models.py`: Contains all Pydantic models
+2. `app/services/scheduler_service.py`: Core scheduling logic
+3. `app/routes/scheduler.py`: API endpoints
+4. `tests/test_scheduler.py`: Basic tests
+
+### Development Guidelines
+
+1. **Keep It Simple**
+
+   - Focus on getting the basic functionality working first
+   - Don't worry about optimization until needed
+   - Use FastAPI's built-in features when possible
+
+2. **Testing Approach**
+
+   - Use transaction-based test isolation
+   - Test one feature at a time
+   - Clean up test data properly
+
+3. **Error Handling**
+   - Use appropriate HTTP status codes
+   - Return clear error messages
+   - Log errors with context
+
+### Database Schema
+
+See `app/database/migrations/001_create_scheduler_tables.sql` for details.
+
+### Execution
+
 1. **Analysis Phase** ✓
 
    - [x] Review requirements
